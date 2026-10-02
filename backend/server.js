@@ -56,7 +56,7 @@ app.get('/api/health', (req, res) => {
 const frontendDist = path.resolve(__dirname, '../frontend/dist');
 if (require('fs').existsSync(frontendDist)) {
   app.use(express.static(frontendDist));
-  app.get('*', (req, res, next) => {
+  app.get('/{*splat}', (req, res, next) => {
     if (req.path.startsWith('/api')) {
       return next();
     }
