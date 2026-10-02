@@ -1783,6 +1783,26 @@ body::after {
   padding: 0;
 }
 
+.nav-icon-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  text-decoration: none;
+}
+.nav-icon-link:hover,
+.nav-icon-link.active {
+  border-color: var(--border);
+  background: var(--light-bg);
+  color: var(--primary);
+}
+
 .account-menu { position: relative; flex: 0 0 auto; }
 .account-menu-trigger {
   display: inline-flex;

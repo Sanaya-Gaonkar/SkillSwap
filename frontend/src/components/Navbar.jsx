@@ -127,20 +127,28 @@ export default function Navbar() {
                   <NavLink to="/learning" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                     <BookOpen size={16} /> Learning
                   </NavLink>
-                  <NavLink to="/chat" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                    <MessageSquare size={16} /> Chat
-                  </NavLink>
-                  <NavLink to="/notifications" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                    <div style={{ position: 'relative', display: 'inline-flex' }}>
-                      <Bell size={16} />
-                      {unreadCount > 0 && (
-                        <span className="nav-notification-count">{unreadCount}</span>
-                      )}
-                    </div>
-                  </NavLink>
                 </div>
                 <div className="nav-quick-actions">
+                  <NavLink
+                    to="/chat"
+                    className={({ isActive }) => `nav-icon-link ${isActive ? 'active' : ''}`}
+                    aria-label="Chat"
+                    title="Chat"
+                  >
+                    <MessageSquare size={18} />
+                  </NavLink>
                   <ShareAppButton iconOnly />
+                  <NavLink
+                    to="/notifications"
+                    className={({ isActive }) => `nav-icon-link ${isActive ? 'active' : ''}`}
+                    aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+                    title={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+                  >
+                    <Bell size={18} />
+                    {unreadCount > 0 && (
+                      <span className="nav-notification-count">{unreadCount}</span>
+                    )}
+                  </NavLink>
                   <AccountMenu user={user} logout={logout} />
                 </div>
               </nav>
