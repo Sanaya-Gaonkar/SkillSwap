@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, Compass, MessageSquare, User, Bell, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import ShareAppButton from './ShareAppButton';
 
 export default function MobileNav() {
   const { user, unreadCount } = useAuth();
@@ -18,6 +19,7 @@ export default function MobileNav() {
           <User size={20} />
           <span>Profile</span>
         </NavLink>
+        <ShareAppButton mobile />
       </nav>
     );
   }
@@ -51,6 +53,7 @@ export default function MobileNav() {
         <User size={20} />
         <span>Profile</span>
       </NavLink>
+      <ShareAppButton mobile />
     </nav>
   );
 }

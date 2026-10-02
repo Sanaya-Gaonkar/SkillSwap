@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from './Logo';
+import ShareAppButton from './ShareAppButton';
 import {
   Compass,
   MessageSquare,
@@ -70,6 +71,7 @@ export default function Navbar() {
                 <NavLink to="/admin" end className={({ isActive }) => `nav-link admin-only ${isActive ? 'active' : ''}`}>
                   <LayoutDashboard size={16} /> Admin Portal
                 </NavLink>
+                <ShareAppButton />
                 <Link
                   to={`/profile/${user.id}`}
                   className="admin-profile-link"
@@ -144,6 +146,7 @@ export default function Navbar() {
                   </div>
                 </NavLink>
 
+                <ShareAppButton />
                 <Link
                   to={`/profile/${user.id}`}
                   className="user-profile-link"
@@ -168,6 +171,7 @@ export default function Navbar() {
             )
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <ShareAppButton />
               <Link to="/login" className="btn btn-outline btn-sm">
                 Log In
               </Link>
