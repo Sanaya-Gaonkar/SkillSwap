@@ -1,0 +1,20 @@
+{
+  "name": "skillswap",
+  "version": "1.0.0",
+  "description": "SkillSwap \u2014 Student-Focused Skill Exchange & Collaborative Learning Platform",
+  "scripts": {
+    "start": "npm run build:frontend && node backend/server.js",
+    "seed": "node backend/seed/seed.js",
+    "backend": "cd backend && npm start",
+    "frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build"
+  },
+  "keywords": [
+    "skillswap",
+    "peer-to-peer",
+    "student-learning",
+    "skill-exchange"
+  ],
+  "author": "SkillSwap Team",
+  "license": "ISC"
+}
