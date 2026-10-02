@@ -1,7 +1,7 @@
 {
   "name": "skillswap",
   "version": "1.0.0",
-  "description": "SkillSwap \u2014 Student-Focused Skill Exchange & Collaborative Learning Platform",
+  "description": "SkillSwap — Student-Focused Skill Exchange & Collaborative Learning Platform",
   "scripts": {
     "start": "npm run build:frontend && node backend/server.js",
     "seed": "node backend/seed/seed.js",
@@ -16,5 +16,8 @@
     "skill-exchange"
   ],
   "author": "SkillSwap Team",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^18.0.5"
+  }
 }
