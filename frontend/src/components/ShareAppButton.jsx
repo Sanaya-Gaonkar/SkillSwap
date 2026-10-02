@@ -20,7 +20,7 @@ function isLocalAddress(hostname) {
     || (octets[0] === 169 && octets[1] === 254);
 }
 
-export default function ShareAppButton({ mobile = false }) {
+export default function ShareAppButton({ mobile = false, iconOnly = false }) {
   const { showToast } = useAuth();
 
   const handleShare = async () => {
@@ -59,6 +59,20 @@ export default function ShareAppButton({ mobile = false }) {
       <button type="button" onClick={handleShare} className="mobile-nav-item" aria-label="Share SkillSwap">
         <Share2 size={20} />
         <span>Share</span>
+      </button>
+    );
+  }
+
+  if (iconOnly) {
+    return (
+      <button
+        type="button"
+        onClick={handleShare}
+        className="btn btn-outline btn-sm nav-share-icon"
+        aria-label="Share SkillSwap"
+        title="Share SkillSwap"
+      >
+        <Share2 size={17} />
       </button>
     );
   }

@@ -43,11 +43,11 @@ function LoadingScreen() {
   );
 }
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, allowAdmin = false }) {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen />;
   if (!user) return <Navigate to="/login" replace />;
-  if (user.role === 'Admin') return <Navigate to="/admin" replace />;
+  if (user.role === 'Admin' && !allowAdmin) return <Navigate to="/admin" replace />;
   return children;
 }
 
@@ -85,7 +85,7 @@ function AppRoutes() {
           <Route path="/discover" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+          <Route path="/profile/edit" element={<ProtectedRoute allowAdmin><EditProfile /></ProtectedRoute>} />
           <Route path="/skills" element={<ProtectedRoute><MySkills /></ProtectedRoute>} />
           <Route path="/connections" element={<ProtectedRoute><Connections /></ProtectedRoute>} />
           <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
