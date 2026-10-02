@@ -1636,14 +1636,18 @@ body::after {
   .nav-links {
     flex: 1 1 auto;
     min-width: 0;
-    justify-content: flex-end;
+    justify-content: flex-start;
     gap: 0.25rem;
-    flex-wrap: wrap;
-    overflow: visible;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
     padding-bottom: 2px;
+    scrollbar-width: none;
   }
-  .nav-link { flex: 0 0 auto; font-size: 12px; }
-  .nav-links > div { flex: 0 0 auto; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links > * { flex: 0 0 auto; }
+  .nav-link { font-size: 12px; }
   .nav-logout { display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
 }
 
@@ -1669,7 +1673,13 @@ body::after {
   .nav-links.admin-nav > .nav-link:not(:first-child):not(.admin-only) {
     display: none;
   }
-  .nav-links.admin-nav { gap: 0.55rem; overflow: visible; }
+  .nav-links.admin-nav {
+    gap: 0.55rem;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
   .nav-links.admin-nav > div { margin-left: 0.35rem !important; }
 }
 .admin-hidden-banner { display: none; }
@@ -1731,11 +1741,15 @@ body::after {
 .admin-nav {
   display: flex !important;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 0.65rem !important;
-  overflow: visible !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
   min-width: 0;
+  scrollbar-width: none;
 }
+.admin-nav::-webkit-scrollbar { display: none; }
 .admin-nav .nav-link.admin-only {
   flex: 0 0 auto;
   background: linear-gradient(135deg, #477C7E, #5C9495);

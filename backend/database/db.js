@@ -1,4 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
 
@@ -144,6 +145,38 @@ async function initDb() {
       );
     }
   }
+
+  const adminEmail = 'admin@skillswap.edu';
+  const adminName = 'admin';
+  const adminPassword = 'admin12';
+  let admin = await db.getAsync('SELECT id, password FROM users WHERE email = ? COLLATE NOCASE', [adminEmail]);
+  const passwordMatches = admin && await bcrypt.compare(adminPassword, admin.password);
+  const passwordHash = passwordMatches ? admin.password : await bcrypt.hash(adminPassword, 10);
+
+  if (!admin) {
+    const result = await db.runAsync(
+      `INSERT INTO users (name, email, password, role, status)
+       VALUES (?, ?, ?, 'Admin', 'active')`,
+      [adminName, adminEmail, passwordHash]
+    );
+    admin = { id: result.lastID };
+  } else {
+    await db.runAsync(
+      `UPDATE users SET name = ?, password = ?, role = 'Admin', status = 'active'
+       WHERE id = ?`,
+      [adminName, passwordHash, admin.id]
+    );
+  }
+
+  await db.runAsync(
+    `INSERT OR IGNORE INTO profiles (user_id, avatar, course, year, bio, interests, availability, learning_mode)
+     VALUES (?, ?, 'Administration', 'Staff', 'Platform Administrator.', 'Community moderation', 'Regular campus hours', 'System management')`,
+    [admin.id, 'https://api.dicebear.com/7.x/bottts/svg?seed=Admin']
+  );
+  await db.runAsync(
+    'INSERT OR IGNORE INTO admins (user_id, name, email) VALUES (?, ?, ?)',
+    [admin.id, adminName, adminEmail]
+  );
 }
 
 module.exports = {
