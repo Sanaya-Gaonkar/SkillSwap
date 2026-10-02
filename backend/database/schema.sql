@@ -178,6 +178,7 @@ CREATE TABLE IF NOT EXISTS learning_goals (
     title TEXT NOT NULL,
     metric TEXT NOT NULL CHECK(metric IN ('exchanges', 'sessions', 'students_taught', 'roadmap_steps', 'positive_reviews')),
     target INTEGER NOT NULL CHECK(target > 0),
+    baseline INTEGER NOT NULL DEFAULT 0,
     deadline DATE,
     completed_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

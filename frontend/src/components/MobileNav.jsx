@@ -1,11 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Compass, MessageSquare, User, Bell, LayoutDashboard } from 'lucide-react';
+import { Home, Compass, MessageSquare, User, Bell, LayoutDashboard, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ShareAppButton from './ShareAppButton';
 
 export default function MobileNav() {
-  const { user, unreadCount } = useAuth();
+  const { user, unreadCount, logout } = useAuth();
   if (!user) return null;
 
   if (user.role === 'Admin') {
@@ -20,6 +20,10 @@ export default function MobileNav() {
           <span>Profile</span>
         </NavLink>
         <ShareAppButton mobile />
+        <button type="button" onClick={logout} className="mobile-nav-item">
+          <LogOut size={20} />
+          <span>Log out</span>
+        </button>
       </nav>
     );
   }
@@ -54,6 +58,10 @@ export default function MobileNav() {
         <span>Profile</span>
       </NavLink>
       <ShareAppButton mobile />
+      <button type="button" onClick={logout} className="mobile-nav-item">
+        <LogOut size={20} />
+        <span>Log out</span>
+      </button>
     </nav>
   );
 }

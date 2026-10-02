@@ -599,36 +599,6 @@ a:hover {
   font-weight: 600;
 }
 
-/* Demo switch banner */
-.demo-banner {
-  background: linear-gradient(90deg, #2563EB, #1D4ED8);
-  color: var(--white);
-  padding: 0.4rem 1rem;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.demo-banner select {
-  background: rgba(255, 255, 255, 0.2);
-  color: var(--white);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: var(--radius-sm);
-  padding: 0.2rem 0.5rem;
-  font-size: 11px;
-  outline: none;
-  cursor: pointer;
-}
-
-.demo-banner select option {
-  color: var(--dark);
-  background: var(--white);
-}
-
-
 /* =========================================================
    SkillSwap visual refresh
    UI-only enhancement layer: no application logic changes.
@@ -892,15 +862,7 @@ main {
   background: linear-gradient(90deg, #6FA569, #5C9495, #F58560);
 }
 
-.demo-banner {
-  background: linear-gradient(100deg, #1C3B40 0%, #3F7778 52%, #5C9495 100%);
-  box-shadow: 0 4px 15px rgba(28,59,64,0.16);
-}
 
-.demo-banner select {
-  background: rgba(255,255,255,0.13);
-  border-color: rgba(255,255,255,0.30);
-}
 
 /* Mobile nav */
 .mobile-nav {
@@ -1676,14 +1638,13 @@ body::after {
     min-width: 0;
     justify-content: flex-end;
     gap: 0.25rem;
-    overflow-x: auto;
-    overflow-y: visible;
+    flex-wrap: wrap;
+    overflow: visible;
     padding-bottom: 2px;
-    scrollbar-width: none;
   }
-  .nav-links::-webkit-scrollbar { display: none; }
   .nav-link { flex: 0 0 auto; font-size: 12px; }
   .nav-links > div { flex: 0 0 auto; }
+  .nav-logout { display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
 }
 
 .custom-skill-row {
@@ -1712,6 +1673,26 @@ body::after {
   .nav-links.admin-nav > div { margin-left: 0.35rem !important; }
 }
 .admin-hidden-banner { display: none; }
+
+.profile-achievements { margin-bottom: 1.75rem; }
+.profile-achievements h2 { margin-bottom: 1rem; font-size: 18px; }
+.profile-badge-list { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.profile-level-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1 1 220px;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #fff;
+}
+.profile-level-badge div { display: flex; flex-direction: column; gap: 0.15rem; }
+.profile-level-badge strong { font-size: 14px; }
+.profile-level-badge span { color: var(--muted); font-size: 12px; }
+.profile-level-badge.level-1 { color: #9A5B26; background: #FFF7ED; border-color: #FED7AA; }
+.profile-level-badge.level-2 { color: #526174; background: #F1F5F9; border-color: #CBD5E1; }
+.profile-level-badge.level-3 { color: #9A6700; background: #FFFBEB; border-color: #FDE68A; }
 
 /* Final UI stability: never leave the app looking blank while auth is resolving. */
 .app-loading-screen {
@@ -1815,9 +1796,11 @@ body::after {
 }
 
 @media (max-width: 767px) {
+  .mobile-nav-item { flex: 1 1 0; min-width: 0; border: 0; padding: 0; background: transparent; cursor: pointer; }
   .admin-nav {
     gap: 0.35rem !important;
   }
+
   .admin-profile-link span,
   .admin-logout span {
     display: none;

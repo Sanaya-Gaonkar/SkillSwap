@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
-const { recordLearningActivity } = require('../utils/learning');
+const { getLevelBadges, recordLearningActivity } = require('../utils/learning');
 
 const ROADMAPS = {
   javascript: [
@@ -55,53 +55,51 @@ async function findPeerTeacher(userId, skillName) {
   return skill || null;
 }
 
-async function getGoalProgress(userId, goal) {
+async function getMetricTotal(userId, metric) {
   const count = async (sql, params = [userId]) => {
     const row = await db.getAsync(sql, params);
     return row?.total || 0;
   };
 
-  let progress = 0;
-  switch (goal.metric) {
+  switch (metric) {
     case 'exchanges':
-      progress = await count(
+      return count(
         `SELECT COUNT(*) AS total FROM skill_exchanges
          WHERE status = 'completed' AND (proposer_id = ? OR receiver_id = ? )`,
         [userId, userId]
       );
-      break;
     case 'sessions':
-      progress = await count(
+      return count(
         `SELECT COUNT(*) AS total FROM sessions s
          JOIN skill_exchanges e ON e.id = s.exchange_id
          WHERE s.status = 'completed' AND (e.proposer_id = ? OR e.receiver_id = ?)`,
         [userId, userId]
       );
-      break;
     case 'students_taught':
-      progress = await count(
+      return count(
         `SELECT COUNT(DISTINCT CASE WHEN e.proposer_id = ? THEN e.receiver_id ELSE e.proposer_id END) AS total
          FROM skill_exchanges e
          WHERE e.status = 'completed' AND (e.proposer_id = ? OR e.receiver_id = ?)`,
         [userId, userId, userId]
       );
-      break;
     case 'roadmap_steps':
-      progress = await count(
+      return count(
         `SELECT COUNT(*) AS total FROM roadmap_steps rs
          JOIN learning_roadmaps lr ON lr.id = rs.roadmap_id
          WHERE lr.user_id = ? AND rs.status = 'completed'`
       );
-      break;
     case 'positive_reviews':
-      progress = await count(
+      return count(
         `SELECT COUNT(*) AS total FROM reviews WHERE reviewed_user_id = ? AND rating >= 4`
       );
-      break;
     default:
-      break;
+      return 0;
   }
-  return Math.min(progress, goal.target);
+}
+
+async function getGoalProgress(userId, goal) {
+  const total = await getMetricTotal(userId, goal.metric);
+  return Math.min(Math.max(total - (goal.baseline || 0), 0), goal.target);
 }
 
 router.use(authenticateToken);
@@ -109,6 +107,13 @@ router.use(authenticateToken);
 router.get('/summary', async (req, res) => {
   try {
     const userId = req.user.id;
+    const timezoneOffset = req.query.timezoneOffset === undefined
+      ? 0
+      : Number(req.query.timezoneOffset);
+    if (!Number.isInteger(timezoneOffset) || timezoneOffset < -840 || timezoneOffset > 840) {
+      return res.status(400).json({ error: 'Timezone offset must be a whole number of minutes between -840 and 840.' });
+    }
+    const timezoneModifier = `${timezoneOffset >= 0 ? '+' : ''}${timezoneOffset} minutes`;
     const activities = await db.allAsync(
       `SELECT activity_type, source_type, source_id, xp, details, occurred_at
        FROM learning_activities WHERE user_id = ? ORDER BY occurred_at DESC LIMIT 30`,
@@ -119,12 +124,12 @@ router.get('/summary', async (req, res) => {
       [userId]
     );
     const activityDates = await db.allAsync(
-      `SELECT DISTINCT date(occurred_at) AS activity_date FROM learning_activities
+      `SELECT DISTINCT date(occurred_at, ?) AS activity_date FROM learning_activities
        WHERE user_id = ? ORDER BY activity_date DESC`,
-      [userId]
+      [timezoneModifier, userId]
     );
     const dates = activityDates.map((row) => row.activity_date);
-    const today = new Date().toISOString().slice(0, 10);
+    const today = new Date(Date.now() + timezoneOffset * 60000).toISOString().slice(0, 10);
     const yesterdayDate = new Date(`${today}T00:00:00.000Z`);
     yesterdayDate.setUTCDate(yesterdayDate.getUTCDate() - 1);
     const yesterday = yesterdayDate.toISOString().slice(0, 10);
@@ -214,6 +219,12 @@ router.get('/summary', async (req, res) => {
     if (positiveReviews.total >= 5) {
       achievements.push({ id: 'knowledge-sharer', name: 'Knowledge Sharer', description: 'Receive five positive peer reviews.' });
     }
+    achievements.push(...getLevelBadges(totalXp).map((badge) => ({
+      id: `level-${badge.level}`,
+      name: badge.name,
+      description: badge.description,
+      type: 'level'
+    })));
 
     res.json({
       xp: totalXp,
@@ -229,6 +240,7 @@ router.get('/summary', async (req, res) => {
       currentStreak,
       longestStreak,
       weeklyActivity: weekDates,
+      levelBadges: getLevelBadges(totalXp),
       achievements,
       activities
     });
@@ -274,9 +286,10 @@ router.post('/goals', async (req, res) => {
       return res.status(400).json({ error: 'Deadline must use the YYYY-MM-DD format.' });
     }
 
+    const baseline = await getMetricTotal(req.user.id, metric);
     const result = await db.runAsync(
-      'INSERT INTO learning_goals (user_id, title, metric, target, deadline) VALUES (?, ?, ?, ?, ?)',
-      [req.user.id, cleanTitle, metric, targetCount, deadline || null]
+      'INSERT INTO learning_goals (user_id, title, metric, target, baseline, deadline) VALUES (?, ?, ?, ?, ?, ?)',
+      [req.user.id, cleanTitle, metric, targetCount, baseline, deadline || null]
     );
     const goal = await db.getAsync('SELECT * FROM learning_goals WHERE id = ?', [result.lastID]);
     res.status(201).json({ goal: { ...goal, progress: await getGoalProgress(req.user.id, goal) } });

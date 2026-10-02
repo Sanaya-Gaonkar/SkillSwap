@@ -17,7 +17,8 @@ import {
   Sparkles,
   AlertTriangle,
   Calendar,
-  Layers
+  Layers,
+  Award
 } from 'lucide-react';
 
 export default function Profile() {
@@ -195,6 +196,20 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {profileUser.levelBadges?.length > 0 && (
+        <section className="card profile-achievements" aria-labelledby="profile-achievements-title">
+          <h2 id="profile-achievements-title">Learning badges</h2>
+          <div className="profile-badge-list">
+            {profileUser.levelBadges.map((badge) => (
+              <article className={`profile-level-badge level-${badge.level}`} key={badge.level}>
+                <Award size={20} aria-hidden="true" />
+                <div><strong>{badge.name}</strong><span>{badge.description}</span></div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* About Me Section (Section 16 & 43) */}
       <div className="card" style={{ marginBottom: '1.75rem' }}>

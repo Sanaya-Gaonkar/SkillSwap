@@ -72,6 +72,11 @@ router.post('/', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Can only schedule sessions for accepted exchanges.' });
     }
 
+    const scheduledTime = new Date(scheduledAt).getTime();
+    if (!Number.isFinite(scheduledTime) || scheduledTime <= Date.now()) {
+      return res.status(400).json({ error: 'Choose a valid session date and time in the future.' });
+    }
+
     const result = await db.runAsync(
       `INSERT INTO sessions (exchange_id, scheduled_at, mode, location_or_link, notes, status)
        VALUES (?, ?, ?, ?, ?, 'scheduled')`,
@@ -127,6 +132,30 @@ router.put('/:id', authenticateToken, async (req, res) => {
 
     if (status && !['scheduled', 'started', 'completed'].includes(status)) {
       return res.status(400).json({ error: 'Invalid session status.' });
+    }
+
+    if (session.status === 'completed' && status && status !== 'completed') {
+      return res.status(400).json({ error: 'A completed session cannot be reopened.' });
+    }
+    if (status === 'completed' && session.status === 'completed') {
+      return res.status(400).json({ error: 'This session has already been completed.' });
+    }
+    if (status === 'started' && session.status !== 'scheduled') {
+      return res.status(400).json({ error: 'Only a scheduled session can be started.' });
+    }
+    if (status === 'scheduled' && session.status !== 'scheduled') {
+      return res.status(400).json({ error: 'A session cannot be moved back to scheduled.' });
+    }
+    if (status === 'started' || status === 'completed') {
+      const scheduledTime = new Date(session.scheduled_at).getTime();
+      if (!Number.isFinite(scheduledTime)) {
+        return res.status(400).json({ error: 'This session has an invalid scheduled date and cannot be started or completed.' });
+      }
+      if (scheduledTime > Date.now()) {
+        return res.status(400).json({
+          error: `This session is scheduled for ${new Date(scheduledTime).toLocaleString()}. You can start or complete it once the scheduled time arrives.`
+        });
+      }
     }
 
     await db.runAsync(

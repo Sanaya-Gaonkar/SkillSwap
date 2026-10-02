@@ -1,5 +1,17 @@
 const { db } = require('../database/db');
 
+const LEVEL_BADGES = [
+  { level: 1, threshold: 1000, name: 'Bronze Learner', description: 'Completed Level 1 by earning 1,000 XP.' },
+  { level: 2, threshold: 2000, name: 'Silver Learner', description: 'Completed Level 2 by earning 2,000 XP.' },
+  { level: 3, threshold: 3000, name: 'Gold Learner', description: 'Completed Level 3 by earning 3,000 XP.' }
+];
+
+function getLevelBadges(totalXp) {
+  return LEVEL_BADGES
+    .filter((badge) => totalXp >= badge.threshold)
+    .map(({ level, name, description }) => ({ level, name, description }));
+}
+
 async function recordLearningActivity(userId, activityType, sourceType, sourceId, xp, details = '') {
   const result = await db.runAsync(
     `INSERT OR IGNORE INTO learning_activities
@@ -37,4 +49,4 @@ async function recordLearningActivity(userId, activityType, sourceType, sourceId
   return result.changes > 0;
 }
 
-module.exports = { recordLearningActivity };
+module.exports = { getLevelBadges, recordLearningActivity };

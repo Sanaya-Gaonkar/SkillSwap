@@ -93,7 +93,10 @@ export const api = {
   getLearningHistory: () => request('/learning-history'),
 
   // Learning goals, roadmaps, and activity
-  getLearningSummary: () => request('/learning/summary'),
+  getLearningSummary: () => {
+    const timezoneOffset = -new Date().getTimezoneOffset();
+    return request(`/learning/summary?timezoneOffset=${timezoneOffset}`);
+  },
   getLearningGoals: () => request('/learning/goals'),
   createLearningGoal: (body) => request('/learning/goals', { method: 'POST', body: JSON.stringify(body) }),
   deleteLearningGoal: (id) => request(`/learning/goals/${id}`, { method: 'DELETE' }),

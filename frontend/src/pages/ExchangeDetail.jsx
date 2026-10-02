@@ -308,7 +308,7 @@ export default function ExchangeDetail() {
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  {sess.mode === 'Online' && sess.location_or_link.startsWith('http') && (
+                  {sess.mode === 'Online' && sess.location_or_link?.startsWith('http') && new Date(sess.scheduled_at) <= new Date() && sess.status !== 'completed' && (
                     <a
                       href={sess.location_or_link}
                       target="_blank"
@@ -317,6 +317,9 @@ export default function ExchangeDetail() {
                     >
                       <Video size={13} /> Join Call <ExternalLink size={11} />
                     </a>
+                  )}
+                  {sess.mode === 'Online' && sess.location_or_link?.startsWith('http') && new Date(sess.scheduled_at) > new Date() && (
+                    <span className="text-small" role="status">Join available at the scheduled time</span>
                   )}
                   {sess.status !== 'completed' && (
                     <button

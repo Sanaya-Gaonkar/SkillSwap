@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
+const { getLevelBadges } = require('../utils/learning');
 
 // Optional auth helper to get user id if logged in
 function getUserIdFromReq(req) {
@@ -220,6 +221,10 @@ router.get('/:id', async (req, res) => {
        WHERE (proposer_id = ? OR receiver_id = ?) AND status = 'completed'`,
       [userId, userId]
     );
+    const learningXp = await db.getAsync(
+      'SELECT COALESCE(SUM(xp), 0) AS total FROM learning_activities WHERE user_id = ?',
+      [userId]
+    );
 
     let connection = null;
     if (currentUserId && currentUserId !== userId) {
@@ -239,6 +244,7 @@ router.get('/:id', async (req, res) => {
         reviews,
         avgRating,
         completedExchanges: completedExchanges?.count || 0,
+        levelBadges: getLevelBadges(learningXp.total),
         connection
       }
     });

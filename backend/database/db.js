@@ -103,6 +103,47 @@ async function initDb() {
       await db.execAsync(`ALTER TABLE profiles ADD COLUMN ${column} ${type}`);
     }
   }
+
+  const goalColumns = await db.allAsync('PRAGMA table_info(learning_goals)');
+  if (!goalColumns.some((column) => column.name === 'baseline')) {
+    await db.execAsync('ALTER TABLE learning_goals ADD COLUMN baseline INTEGER NOT NULL DEFAULT 0');
+  }
+
+  const skillCount = await db.getAsync('SELECT COUNT(*) AS total FROM skills');
+  if (skillCount.total === 0) {
+    const starterSkills = [
+      ['Python', 'Programming', 'Python programming, scripting, and data analysis'],
+      ['Java', 'Programming', 'Java programming and object-oriented fundamentals'],
+      ['JavaScript', 'Programming', 'Modern JavaScript and interactive programming'],
+      ['C++', 'Programming', 'C++ programming and data structures'],
+      ['SQL', 'Programming', 'Database queries, joins, and relational design'],
+      ['R', 'Programming', 'Statistical programming and data visualization'],
+      ['HTML', 'Web', 'Semantic HTML and accessible web structure'],
+      ['CSS', 'Web', 'Responsive styling, layouts, and animations'],
+      ['Web Development', 'Web', 'Frontend and backend web development'],
+      ['React', 'Web', 'Reusable user interfaces with React'],
+      ['UI/UX', 'Design', 'User research, wireframing, and interaction design'],
+      ['Figma', 'Design', 'Interface design, prototyping, and design systems'],
+      ['Graphic Design', 'Design', 'Typography, composition, and visual communication'],
+      ['Photoshop', 'Design', 'Photo editing and image composition'],
+      ['Illustrator', 'Design', 'Vector illustration and logo design'],
+      ['Public Speaking', 'Business', 'Presentation, speech structure, and delivery'],
+      ['Business Presentation', 'Business', 'Business storytelling and presentation design'],
+      ['Financial Modelling', 'Business', 'Financial statements, forecasting, and valuation'],
+      ['Social Media Strategy', 'Business', 'Social content planning and engagement analytics'],
+      ['Academic Writing', 'Other', 'Research writing, citations, and editing'],
+      ['Spanish', 'Other', 'Spanish conversation, grammar, and vocabulary'],
+      ['Video Editing', 'Other', 'Video editing, pacing, and audio balancing'],
+      ['Git/GitHub', 'Other', 'Version control, branches, and collaboration'],
+      ['Excel', 'Other', 'Formulas, PivotTables, and spreadsheet analysis']
+    ];
+    for (const [name, category, description] of starterSkills) {
+      await db.runAsync(
+        'INSERT INTO skills (name, category, description) VALUES (?, ?, ?)',
+        [name, category, description]
+      );
+    }
+  }
 }
 
 module.exports = {

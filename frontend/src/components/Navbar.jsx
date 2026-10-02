@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from './Logo';
 import ShareAppButton from './ShareAppButton';
@@ -13,54 +13,16 @@ import {
   ShieldAlert,
   Calendar,
   History,
-  UserCheck,
   LayoutDashboard,
   BookOpen
 } from 'lucide-react';
 
 export default function Navbar() {
-  const { user, logout, unreadCount, login } = useAuth();
-  const navigate = useNavigate();
+  const { user, logout, unreadCount } = useAuth();
   const isAdmin = user?.role === 'Admin';
-
-  const handleDemoSwitch = async (e) => {
-    const val = e.target.value;
-    if (!val) return;
-    const [email, pwd] = val.split(':');
-    try {
-      await login(email, pwd);
-      navigate('/home');
-    } catch (err) {
-      console.error('Demo switch failed:', err);
-    }
-  };
 
   return (
     <>
-      {!isAdmin && (
-        <div className="demo-banner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <UserCheck size={14} />
-            <span><strong>Demo Switcher:</strong> Switch student persona instantly to test 2-way swaps and chat:</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <select
-              onChange={handleDemoSwitch}
-              value={user ? `${user.email}:password123` : ''}
-              aria-label="Switch demo student"
-            >
-              <option value="" disabled>-- Switch Student Account --</option>
-              <option value="ashwet@skillswap.edu:password123">Ashwet Pilankar (IT 4th Yr - Python/Java ⇋ UI/UX)</option>
-              <option value="priya@skillswap.edu:password123">Priya Sharma (Design 3rd Yr - Design ⇋ Python)</option>
-              <option value="rahul@skillswap.edu:password123">Rahul Patil (CS 2nd Yr - Web/UI ⇋ Java)</option>
-              <option value="rohan@skillswap.edu:password123">Rohan Mehta (CS 3rd Yr - Python/SQL ⇋ Design)</option>
-              <option value="ananya@skillswap.edu:password123">Ananya Sen (Media 2nd Yr - Graphics ⇋ Python)</option>
-              <option value="marcus@skillswap.edu:password123">Marcus Vance (Econ Final Yr - Stats/R ⇋ Spanish)</option>
-            </select>
-          </div>
-        </div>
-      )}
-
       <header className={`navbar ${isAdmin ? 'navbar-admin' : ''}`}>
         <div className="container nav-container">
           <Logo size="medium" to={user ? (isAdmin ? '/admin' : '/home') : '/'} />
@@ -160,12 +122,12 @@ export default function Navbar() {
 
                 <button
                   onClick={logout}
-                  className="btn btn-ghost btn-sm"
+                  className="btn btn-ghost btn-sm nav-logout"
                   title="Log out"
                   type="button"
-                  style={{ padding: '0.4rem', color: 'var(--muted)' }}
                 >
                   <LogOut size={16} />
+                  <span>Log out</span>
                 </button>
               </nav>
             )

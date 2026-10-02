@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
-import { Eye, EyeOff, Lock, Mail, ArrowRight, UserCheck } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 
 export default function Login() {
   const { login, showToast } = useAuth();
@@ -30,29 +30,14 @@ export default function Login() {
 
     try {
       setLoading(true);
-      await login(email, password);
-      navigate('/home');
+      const authenticatedUser = await login(email, password);
+      navigate(authenticatedUser.role === 'Admin' ? '/admin' : '/home');
     } catch (err) {
       setError(err.message || 'Invalid email or password.');
     } finally {
       setLoading(false);
     }
   };
-
-  const handleQuickDemo = async (demoEmail, demoPassword) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-    try {
-      setLoading(true);
-      await login(demoEmail, demoPassword);
-      navigate('/home');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
 
   return (
     <div
@@ -183,40 +168,6 @@ export default function Login() {
             {loading ? 'Logging in...' : 'Log in'}
           </button>
         </form>
-
-        {/* Quick Demo Credentials Assistant */}
-        <div style={{ marginTop: '1.5rem', padding: '0.85rem', backgroundColor: '#F8FAFC', borderRadius: 'var(--radius-md)', border: '1px dashed var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.5rem', color: 'var(--dark)' }}>
-            <UserCheck size={14} color="var(--primary)" />
-            <strong style={{ fontSize: '11px', textTransform: 'uppercase' }}>1-Click Demo Logins:</strong>
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-            <button
-              type="button"
-              onClick={() => handleQuickDemo('ashwet@skillswap.edu', 'password123')}
-              className="btn btn-outline btn-sm"
-              style={{ fontSize: '11px', padding: '0.2rem 0.5rem' }}
-            >
-              Ashwet (IT)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickDemo('priya@skillswap.edu', 'password123')}
-              className="btn btn-outline btn-sm"
-              style={{ fontSize: '11px', padding: '0.2rem 0.5rem' }}
-            >
-              Priya (Design)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickDemo('rahul@skillswap.edu', 'password123')}
-              className="btn btn-outline btn-sm"
-              style={{ fontSize: '11px', padding: '0.2rem 0.5rem' }}
-            >
-              Rahul (Web)
-            </button>
-          </div>
-        </div>
 
         {/* Bottom Switch */}
         <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border)' }}>

@@ -29,7 +29,7 @@ export default function ScheduleSessionModal({
       setSubmitting(true);
       await api.scheduleSession({
         exchangeId: exchange.id,
-        scheduledAt,
+        scheduledAt: new Date(scheduledAt).toISOString(),
         mode,
         locationOrLink: locationOrLink.trim(),
         notes: notes.trim()
